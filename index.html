@@ -3,7 +3,7 @@
 <head>  
 <meta charset="UTF-8">  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Phone Simulator</title>  
+<title>Phone Simulator Full</title>  
 <style>  
 body {  
   margin:0;  
@@ -20,7 +20,7 @@ body {
   background:#111;  
   border-radius:36px;  
   position:relative;  
-  box-shadow:inset 0 0 0 4px #222,0 30px 60px rgba(0,0,0,.6);  
+  box-shadow:inset 0 0 0 4px #222, 0 30px 60px rgba(0,0,0,.6);  
 }  
 .screen {  
   position:absolute;  
@@ -40,6 +40,7 @@ body {
   padding:0 8px;  
   font-size:10px;  
   background:rgba(0,0,0,.25);  
+  z-index: 100;
 }  
 .sb-left { font-weight:500; }  
 .sb-right { display:flex; gap:6px; align-items:center; }  
@@ -52,68 +53,103 @@ body {
 .battery { width:16px; height:8px; border:1px solid #fff; border-radius:2px; position:relative; }  
 .battery::after { content:""; position:absolute; right:-3px; top:2px; width:2px; height:4px; background:#fff; }  
 .battery-level { height:100%; width:50%; background:#fff; }  
-.screen-off { position:absolute; inset:0; background:#000; z-index:10; }  
-.hidden { display:none; }  
-.lock { position:absolute; inset:22px 0 0 0; background:linear-gradient(180deg,#020617,#0ea5e9); display:flex; flex-direction:column; justify-content:center; align-items:center; user-select:none; }  
+.screen-off { position:absolute; inset:0; background:#000; z-index:1000; }  
+.hidden { display:none !important; }  
+
+/* Layer Management */
+.lock { position:absolute; inset:22px 0 0 0; background:linear-gradient(180deg,#020617,#0ea5e9); display:flex; flex-direction:column; justify-content:center; align-items:center; user-select:none; z-index: 80; }  
+.home { position:absolute; inset:22px 0 0 0; background:linear-gradient(180deg, #0b1220,#020617); padding:12px 10px; z-index: 50; }  
+.appview { position:absolute; inset:22px 0 0 0; background:#020617; display:flex; flex-direction:column; z-index: 90; }  
+
 .time { font-size:40px; font-weight:600; }  
 .date { font-size:12px; opacity:.85; margin-bottom:40px; }  
 .swipe { font-size:11px; opacity:.7; }  
-.home { position:absolute; inset:22px 0 0 0; background:linear-gradient(180deg,#0b1220,#020617); padding:12px 10px; }  
 .apps { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }  
 .app { width:70px; text-align:center; font-size:11px; cursor:pointer; line-height:1.2; }  
 .icon { width:44px; height:44px; border-radius:14px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 3px; }  
-.appview { position:absolute; inset:22px 0 0 0; background:#020617; display:flex; flex-direction:column; }  
-.appview.hidden { display:none; }  
 .topbar { height:36px; display:flex; align-items:center; padding:0 10px; border-bottom:1px solid #1e293b; }  
 .back { cursor:pointer; font-size:13px; }  
 .appcontent { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:16px; padding:8px; overflow:auto; }  
 .power { position:absolute; right:-6px; top:140px; width:6px; height:60px; background:#333; border-radius:4px; cursor:pointer; }  
 .homebar { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); width:60px; height:4px; background:#444; border-radius:4px; pointer-events:none; }  
-.brightness-overlay { position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; z-index:9; transition:opacity .2s linear; }  
+
+/* Game & Chat Styles */
+iframe { width:415px; height:800px; border:none; transform:scale(0.55); transform-origin:top left; }  
 .game-list button,.songBtn { width:100%; margin:6px 0; padding:8px; border:none; border-radius:6px; background:#1e293b; color:white; cursor:pointer; }  
-.game-list button:hover,.songBtn:hover { background:#0ea5e9; }  
-iframe { width:480px; height:800px; border:none; transform:scale(0.55); transform-origin:top left; }  
+
+/* Camera & Gallery Styles */
+#camPreview { width: 100%; height: 200px; background: #000; object-fit: cover; border-radius: 8px; }
+.cam-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; margin-top: 10px; }
+.cam-btn { padding: 8px; border: none; border-radius: 4px; background: #334155; color: white; cursor: pointer; font-size: 11px; }
+.zoom-slider { width: 100%; margin-top: 10px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; width: 100%; }
+.gallery-item { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; background: #1e293b; cursor: pointer; }
+.fullscreen-view { position: absolute; inset: 0; background: #000; z-index: 2000; display: flex; justify-content: center; align-items: center; }
+.close-full { position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; z-index: 2001; font-weight: bold; }
+
+/* Notes Styles */
+#noteArea { width: 100%; height: 80%; background: #1e293b; color: white; border: none; border-radius: 8px; padding: 10px; resize: none; box-sizing: border-box; }
+
+/* Brightness Overlay */
+#brightnessOverlay { position: absolute; inset: 0; background: black; opacity: 0; pointer-events: none; z-index: 999; }
 </style>  
 </head>  
 <body>  
 <div class="phone">  
   <div class="screen">  
+    <div id="brightnessOverlay"></div>
     <div class="screen-off hidden" id="screenOff"></div>  
+    
+    <div id="galleryFull" class="fullscreen-view hidden">
+      <button class="close-full" id="btnExitFull">Tutup</button>
+      <div id="fullMediaContainer" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
+    </div>
+
     <div class="statusbar">  
       <div class="sb-left" id="sbTime">00:00</div>  
       <div class="sb-right">  
+        <div id="musicIcon" class="hidden" style="margin-right: 4px;">🎵</div>
         <div class="signal"><span></span><span></span><span></span><span></span></div>  
         <div class="battery"><div class="battery-level" id="batteryLevel"></div></div>  
       </div>  
-    </div>  <div class="lock" id="lock">  
-  <div class="time" id="time"></div>  
-  <div class="date" id="date"></div>  
-  <div class="swipe">Swipe up untuk buka</div>  
-</div>  
+    </div>  
+    
+    <div class="lock" id="lock">  
+      <div class="time" id="time"></div>  
+      <div class="date" id="date"></div>  
+      <div class="swipe">Swipe up untuk buka</div>  
+    </div>  
 
-<div class="home hidden" id="home">  
-  <div class="apps">  
-    <div class="app" data-app="Notes"><div class="icon">📝</div>Notes</div>  
-    <div class="app" data-app="Game"><div class="icon">🎮</div>Game</div>  
-    <div class="app" data-app="Calculator"><div class="icon">🧮</div>Calculator</div>  
-    <div class="app" data-app="Settings"><div class="icon">⚙️</div>Settings</div>  
-    <div class="app" data-app="Music"><div class="icon">🎵</div>Music</div>  
-  </div>  
-</div>  
+    <div class="home hidden" id="home">  
+      <div class="apps">  
+        <div class="app" data-app="Notes"><div class="icon">📝</div>Notes</div>  
+        <div class="app" data-app="Game"><div class="icon">🎮</div>Game</div>  
+        <div class="app" data-app="Chat"><div class="icon">💬</div>V-Chat</div>
+        <div class="app" data-app="Music"><div class="icon">🎵</div>Music</div>  
+        <div class="app" data-app="Camera"><div class="icon">📷</div>Kamera</div>
+        <div class="app" data-app="Gallery"><div class="icon">🖼️</div>Galeri</div>
+        <div class="app" data-app="Settings"><div class="icon">⚙️</div>Settings</div>  
+      </div>  
+    </div>  
 
-<div class="appview hidden" id="appView">  
-  <div class="topbar"><div class="back" id="back">← Back</div></div>  
-  <div class="appcontent" id="appContent"></div>  
-</div>  
-
-<div class="brightness-overlay" id="brightnessOverlay"></div>
+    <div class="appview hidden" id="appView">  
+      <div class="topbar"><div class="back" id="back">← Back</div></div>  
+      <div class="appcontent" id="appContent"></div>  
+    </div>  
 
   </div>  
   <div class="homebar"></div>  
   <div class="power" id="power"></div>  
-</div>  <script>  
-let screenOn=true,startY=0;  
-  
+</div>  
+
+<script>  
+let screenOn=true, startY=0;  
+let galleryData = JSON.parse(localStorage.getItem('phone_gallery')) || []; 
+let stream = null;
+let mediaRecorder = null;
+let chunks = [];
+let audioIsPlaying = false;
+
 function updateTime(){  
   const now=new Date();  
   const h=now.getHours().toString().padStart(2,'0');  
@@ -125,108 +161,220 @@ function updateTime(){
 setInterval(updateTime,1000);updateTime();  
   
 lock.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;});  
-lock.addEventListener('touchend',e=>{if(startY-e.changedTouches[0].clientY>60&&screenOn){lock.classList.add('hidden');home.classList.remove('hidden');}});  
+lock.addEventListener('touchend',e=>{
+    if(startY - e.changedTouches[0].clientY > 60 && screenOn){
+        lock.classList.add('hidden');
+        home.classList.remove('hidden');
+    }
+});  
   
 document.querySelectorAll('.app').forEach(app=>{  
   app.onclick=()=>{  
     home.classList.add('hidden'); appView.classList.remove('hidden');  
   
-    if(app.dataset.app==='Settings'){  
-      appContent.innerHTML=`<div style="padding:12px;font-size:13px;">  
-        <b>Pengaturan</b><br><br>  
-        Kecerahan Layar<br><input type="range" min="0" max="100" value="100" id="brightnessRange"><br><br>  
-        Suara<br><input type="range" min="0" max="100" value="100"><br><br>  
-        Mode Gelap<br><input type="checkbox"><br><br>  
-        Volume Media<br><input type="range" min="0" max="100" value="50"><br><br>  
-        Rotasi Layar<br><input type="checkbox"><br><br>  
-        Notifikasi<br><input type="checkbox"><br><br>  
-        Lock Screen Animasi<br><input type="checkbox"><br><br>  
-        WiFi<br><input type="checkbox"><br><br>  
-        Bluetooth<br><input type="checkbox"><br><br>  
-        Data Seluler<br><input type="checkbox"><br><br>  
-      </div>`;  
-      setTimeout(()=>{const range=document.getElementById('brightnessRange');if(range)range.oninput=()=>{brightnessOverlay.style.opacity=(100-range.value)/100*0.6;};},0);  
-  
+    if(app.dataset.app==='Chat'){  
+      appContent.innerHTML=`<div style="width:100%;height:100%;overflow:auto;">
+        <iframe src='https://novanardi13-coder.github.io/V-CHAT/' style="width:100%; height:100%; transform:none;"></iframe>
+      </div>`;
+
     } else if(app.dataset.app==='Game'){  
-      appContent.innerHTML=`<div class='game-list'>  
+      appContent.innerHTML=`<div class='game-list' style="width:100%; overflow:auto;">  
         <button data-link='https://novanardi13-coder.github.io/Tic-tac-to/'>Tic Tac Toe</button>  
-        <button data-link='https://blockblast.game/'>Block Blast</button>  
+        <button data-link='https://blockblast.game/'>Block Blast</button>
+        <button data-link='https://hextris.io/'>Hextris</button>
+        <button data-link='https://flappybird.io/'>Flappy Bird</button>
+        <button data-link='https://chromedino.com/'>Chrome Dino</button>
+        <button data-link='https://www.towergame.app/'>Tower Builder</button>
       </div>`;  
       setTimeout(()=>{document.querySelectorAll('.game-list button').forEach(btn=>{  
         btn.onclick=()=>{const link=btn.dataset.link;  
-          appContent.innerHTML=`<div style="width:100%;height:100%;overflow:auto;"><iframe src='${link}' style='border:none;width:415px;height:800px;transform:scale(0.55);transform-origin:top left;'></iframe></div>`;};});},0);  
+          appContent.innerHTML=`<div style="width:100%;height:100%;overflow:auto;"><iframe src='${link}'></iframe></div>`;};});},0);  
   
-    } else if(app.dataset.app==='Calculator'){  
-      appContent.innerHTML=`<div style='display:flex;flex-direction:column;align-items:center;'>  
-        <input type='text' id='calcDisplay' style='width:100%;margin-bottom:8px;font-size:18px;text-align:right;' disabled>  
-        <div style='display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%;'>  
-          <button onclick="calcPress('7')">7</button>  
-          <button onclick="calcPress('8')">8</button>  
-          <button onclick="calcPress('9')">9</button>  
-          <button onclick="calcPress('/')">/</button>  
-          <button onclick="calcPress('4')">4</button>  
-          <button onclick="calcPress('5')">5</button>  
-          <button onclick="calcPress('6')">6</button>  
-          <button onclick="calcPress('*')">*</button>  
-          <button onclick="calcPress('1')">1</button>  
-          <button onclick="calcPress('2')">2</button>  
-          <button onclick="calcPress('3')">3</button>  
-          <button onclick="calcPress('-')">-</button>  
-          <button onclick="calcPress('0')">0</button>  
-          <button onclick="calcPress('.')">.</button>  
-          <button onclick="calcPress('=')">=</button>  
-          <button onclick="calcPress('+')">+</button>  
+    } else if(app.dataset.app==='Music'){  
+      appContent.innerHTML=`<div id="musicApp" style='width:100%;text-align:center;'>  
+        <div id="currentSong" style='margin-bottom:8px;font-size:14px;font-weight:bold;'>Pilih lagu</div>  
+        <audio id="audioPlayer" controls style='width:100%;'>  
+          <source src='KMNH.mp3' type='audio/mpeg'>  
+        </audio>  
+        <div id="songList" style='margin-top:8px;text-align:left;max-height:180px;overflow:auto;'>  
+          <button class="songBtn" data-src="KMNH.mp3">KMNH</button>  
+          <button class="songBtn" data-src="HPRO.mp3">DJ HPRO eksekutor</button>  
+          <button class="songBtn" data-src="WarMor.mp3">Warriyo mortals</button>  
+          <button class="songBtn" data-src="Nrotok.mp3">Dj Nrotok Didik Jangkrik</button>  
+          <button class="songBtn" data-src="DL.mp3">DJ luka negara(hiroshima)</button>  
+          <button class="songBtn" data-src="DAL.mp3">DJ aku dah lupa</button>  
+          <button class="songBtn" data-src="DA.mp3">DJ APT Thailand</button>  
         </div>  
       </div>`;  
-  
-    } else if(app.dataset.app==='Notes'){  
-      appContent.innerHTML=`<textarea style='width:100%;height:90%;background:#111;color:white;padding:8px;border:none;border-radius:6px;' placeholder='Tulis catatanmu di sini...'></textarea>`;  } else if(app.dataset.app==='Music'){  
-  appContent.innerHTML=`<div id="musicApp" style='width:100%;text-align:center;'>  
-    <div id="currentSong" style='margin-bottom:8px;font-size:14px;font-weight:bold;'>Pilih lagu</div>  
-    <audio id="audioPlayer" controls style='width:100%;'>  
-      <source src='KMNH.mp3' type='audio/mpeg'>  
-      Browsermu tidak mendukung audio.  
-    </audio>  
-    <div id="songList" style='margin-top:8px;text-align:left;max-height:180px;overflow:auto;'>  
-      <button class="songBtn" data-src="KMNH.mp3">KMNH</button>  
-      <button class="songBtn" data-src="HPRO.mp3">DJ HPRO eksekutor</button>  
-      <button class="songBtn" data-src="WarMor.mp3">Warriyo mortals</button>  
-      <button class="songBtn" data-src="Nrotok.mp3">Dj Nrotok Didik Jangkrik</button>  
-      <button class="songBtn" data-src="DL.mp3">DJ luka negara(hiroshima)</button>  
-      <button class="songBtn" data-src="DAL.mp3">DJ aku dah lupa</button>  
-      <button class="songBtn" data-src="DA.mp3">DJ APT Thailand</button>  
-      <button class="songBtn" data-src="Song8.mp3">Song 8</button>  
-      <button class="songBtn" data-src="Song9.mp3">Song 9</button>  
-      <button class="songBtn" data-src="Song10.mp3">Song 10</button>  
-    </div>  
-  </div>`;  
-  setTimeout(()=>{  
-    const audioPlayer=document.getElementById('audioPlayer');  
-    const currentSong=document.getElementById('currentSong');  
-    document.querySelectorAll('.songBtn').forEach(btn=>{  
-      btn.onclick=()=>{audioPlayer.src=btn.dataset.src; audioPlayer.play(); currentSong.textContent=btn.textContent;};  
-    });  
-  },0);  
-} else { appContent.textContent=app.dataset.app+' App'; }
+      setTimeout(()=>{  
+        const audioPlayer=document.getElementById('audioPlayer');  
+        const currentSong=document.getElementById('currentSong');  
+        const musicIcon=document.getElementById('musicIcon');
+        document.querySelectorAll('.songBtn').forEach(btn=>{  
+          btn.onclick=()=>{
+            audioPlayer.src=btn.dataset.src; 
+            audioPlayer.play(); 
+            currentSong.textContent=btn.textContent;
+            musicIcon.classList.remove('hidden');
+            audioIsPlaying = true;
+          };  
+        });  
+      },0);  
+    } else if(app.dataset.app==='Camera'){
+      appContent.innerHTML = `
+        <video id="camPreview" autoplay playsinline style="width:100%; height:180px; object-fit:cover;"></video>
+        <div style="font-size:10px; margin-top:5px;">Zoom:</div>
+        <input type="range" id="zoomRange" class="zoom-slider" min="1" max="3" step="0.1" value="1">
+        <div class="cam-controls">
+          <button class="cam-btn" id="takePhoto">📸 Foto</button>
+          <button class="cam-btn" id="recordVid">🎥 Rekam</button>
+        </div>
+        <canvas id="camCanvas" style="display:none;"></canvas>
+      `;
+      const video = document.getElementById('camPreview');
+      const zoomRange = document.getElementById('zoomRange');
+      
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: true }).then(s => { 
+        stream = s; 
+        video.srcObject = s; 
+        
+        const track = s.getVideoTracks()[0];
+        const capabilities = track.getCapabilities();
+        if (capabilities.zoom) {
+            zoomRange.min = capabilities.zoom.min;
+            zoomRange.max = capabilities.zoom.max;
+            zoomRange.step = capabilities.zoom.step;
+            zoomRange.oninput = () => {
+                track.applyConstraints({ advanced: [{ zoom: zoomRange.value }] });
+            };
+        } else {
+            zoomRange.disabled = true;
+        }
+      }).catch(e => alert("Kamera tidak diizinkan"));
+      
+      document.getElementById('takePhoto').onclick = () => {
+        const canvas = document.getElementById('camCanvas');
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        saveToGallery('img', canvas.toDataURL('image/png'));
+        alert("Foto disimpan!");
+      };
 
-};
+      document.getElementById('recordVid').onclick = function() {
+        if(mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+          this.textContent = "🎥 Rekam"; this.style.background = "#334155";
+        } else {
+          chunks = []; mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = e => chunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/mp4' });
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => saveToGallery('vid', reader.result);
+            alert("Video disimpan!");
+          };
+          mediaRecorder.start();
+          this.textContent = "🛑 STOP"; this.style.background = "red";
+        }
+      };
+    } else if(app.dataset.app==='Gallery'){
+      renderGallery();
+    } else if(app.dataset.app==='Notes'){
+      const savedNote = localStorage.getItem('phone_note') || "";
+      appContent.innerHTML = `
+        <h3 style="margin:0 0 10px 0; font-size:14px;">Catatan Pribadi</h3>
+        <textarea id="noteArea" placeholder="Tulis sesuatu...">${savedNote}</textarea>
+        <button id="saveNote" style="width:100%; margin-top:10px; padding:8px; border-radius:5px; background:#0ea5e9; color:white; border:none; cursor:pointer;">Simpan Catatan</button>
+      `;
+      document.getElementById('saveNote').onclick = () => {
+        const val = document.getElementById('noteArea').value;
+        localStorage.setItem('phone_note', val);
+        alert("Catatan tersimpan di localstorage!");
+      };
+    } else if(app.dataset.app==='Settings'){
+      const currentBrightness = localStorage.getItem('phone_brightness') || 0;
+      appContent.innerHTML = `
+        <div style="width:100%; text-align:left; font-size:13px;">
+          <p><b>Informasi Perangkat</b></p>
+          <div style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:15px;">
+             Versi Sistem: 1.2.0<br>
+             Model: Simulator V1
+          </div>
+          <p><b>Kecerahan Layar</b></p>
+          <input type="range" id="brightRange" min="0" max="0.7" step="0.01" value="${currentBrightness}" style="width:100%;">
+        </div>
+      `;
+      document.getElementById('brightRange').oninput = (e) => {
+        const b = e.target.value;
+        document.getElementById('brightnessOverlay').style.opacity = b;
+        localStorage.setItem('phone_brightness', b);
+      };
+    } else {
+      appContent.innerHTML = `<div>Aplikasi ${app.dataset.app} sedang dikembangkan.</div>`;
+    }
+  };
 });
 
-function calcPress(val){
-const display=document.getElementById('calcDisplay');
-if(!display) return;
-if(val==='='){try{display.value=eval(display.value);}catch{display.value='Error';}}
-else display.value+=val;
+const initBright = localStorage.getItem('phone_brightness') || 0;
+document.getElementById('brightnessOverlay').style.opacity = initBright;
+
+function saveToGallery(type, data){
+    galleryData.push({type, src: data});
+    localStorage.setItem('phone_gallery', JSON.stringify(galleryData));
 }
 
-back.onclick=()=>{appView.classList.add('hidden');home.classList.remove('hidden');};
-power.onclick=()=>{screenOn=!screenOn;if(!screenOn){screenOff.classList.remove('hidden');lock.classList.add('hidden');home.classList.add('hidden');appView.classList.add('hidden');}else{screenOff.classList.add('hidden');lock.classList.remove('hidden');}};
+function renderGallery(){
+  if(galleryData.length === 0) {
+    appContent.innerHTML = "Galeri Kosong";
+  } else {
+    let html = '<div class="gallery-grid">';
+    galleryData.forEach(item => {
+      if(item.type === 'img') html += `<img src="${item.src}" class="gallery-item" onclick="viewFull('${item.src}', 'img')">`;
+      else html += `<video src="${item.src}" class="gallery-item" onclick="viewFull('${item.src}', 'vid')"></video>`;
+    });
+    html += '</div><button onclick="clearGallery()" style="margin-top:10px; font-size:10px; background:red; color:white; border:none; padding:5px; border-radius:4px;">Hapus Semua</button>';
+    appContent.innerHTML = html;
+  }
+}
+
+function clearGallery(){
+    if(confirm("Hapus semua?")){ galleryData = []; localStorage.removeItem('phone_gallery'); renderGallery(); }
+}
+
+function viewFull(src, type){
+  const container = document.getElementById('fullMediaContainer');
+  const overlay = document.getElementById('galleryFull');
+  overlay.classList.remove('hidden');
+  if(type === 'img') container.innerHTML = `<img src="${src}" style="max-width:100%; max-height:100%;">`;
+  else container.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%;"></video>`;
+}
+
+document.getElementById('btnExitFull').onclick = () => {
+  document.getElementById('galleryFull').classList.add('hidden');
+  document.getElementById('fullMediaContainer').innerHTML = '';
+};
+
+back.onclick=()=>{
+  if(stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  appView.classList.add('hidden'); home.classList.remove('hidden');
+};
+
+power.onclick=()=>{
+  screenOn=!screenOn;
+  if(!screenOn){
+    if(stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    screenOff.classList.remove('hidden');
+  } else {
+    screenOff.classList.add('hidden'); lock.classList.remove('hidden');
+    home.classList.add('hidden'); appView.classList.add('hidden');
+  }
+};
 
 function updateBattery(){
 navigator.getBattery().then(bat=>{document.getElementById('batteryLevel').style.width=Math.round(bat.level*100)+'%';});
 }
 setInterval(updateBattery,5000);updateBattery();
 </script>
-
 </body>  
 </html>
