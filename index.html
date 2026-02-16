@@ -97,7 +97,7 @@ iframe { width:100%; height:100%; border:none; transform-origin: top left; }
 /* Responsive iframe adjustments */
 @media (max-width: 260px) {
   iframe {
-    transform: scale(0.7);
+    transform: scale(0.8);
   }
 }
 
@@ -135,7 +135,7 @@ iframe { width:100%; height:100%; border:none; transform-origin: top left; }
     <div class="lock" id="lock">  
       <div class="time" id="time"></div>  
       <div class="date" id="date"></div>  
-      <div class="swipe">Geser ke atas untuk membuka</div>  
+      <div class="swipe">Swipe up untuk buka</div>  
     </div>  
 
     <div class="home hidden" id="home">  
@@ -202,7 +202,8 @@ document.querySelectorAll('.app').forEach(app=>{
       </div>`;
       
     } else if(app.dataset.app==='Game'){  
-      appContent.innerHTML=`<div class='game-list' style="width:100%; overflow:auto;">
+      appContent.innerHTML=`<div class='game-list' style="width:100%; overflow:auto;">  
+        <button data-link='https://novanardi13-coder.github.io/Tic-tac-to/'>Tic Tac Toe</button>  
         <button data-link='https://blockblast.game/'>Block Blast</button>
         <button data-link='https://hextris.io/'>Hextris</button>
         <button data-link='https://flappybird.io/'>Flappy Bird</button>
@@ -405,7 +406,7 @@ power.onclick=()=>{
 function updateBattery(){
 navigator.getBattery().then(bat=>{document.getElementById('batteryLevel').style.width=Math.round(bat.level*100)+'%';});
 }
-setInterval(updateBattery,1000);updateBattery();
+setInterval(updateBattery,5000);updateBattery();
 </script>
 </body>  
 </html>
